@@ -1,0 +1,164 @@
+#cloud-config
+
+# This is the user-data configuration file for cloud-init. By default this sets
+# up an initial user called "ubuntu" with password "DS1Rocks", which must be
+# changed at first login. However, many additional actions can be initiated on
+# first boot from this file. The cloud-init documentation has more details:
+#
+# https://cloudinit.readthedocs.io/
+#
+# Some additional examples are provided in comments below the default
+# configuration.
+users:
+- name: ubuntu
+  gecos: DS1 Rocks
+  primary_group: ubuntu
+  shell: /bin/bash
+  sudo: ALL=(ALL) NOPASSWD:ALL
+  groups: adm, dialout, cdrom, floppy, sudo, audio, dip, video, plugdev, netdev, lxd
+  chpasswd: {expire: False}
+  lock_passwd: false
+  passwd: $6$rounds=656000$gaNyeryeb4sncOl4$VLElRoLJQ7BQZBGvy.Whh77bxphIJYOFjwrtsJHpg/x6ZTZ8R6Iep8EjDvPaLmnkfHvNIkA/PUYIGwEPDgc9F/
+  ssh_import_id: None
+  ssh_pwauth: true
+
+# Enable password authentication with the SSH daemon
+ssh_pwauth: true
+## Add users and groups to the system, and import keys with the ssh-import-id
+## utility
+groups:
+- ubuntu: [ubuntu]
+- docker: [docker]
+
+hostname: rancher-mgmt
+
+apt:
+  preserve_sources_list: true
+  sources:
+    docker.list:
+      source: "deb [arch=arm64] https://download.docker.com/linux/ubuntu focal stable"
+      keyid: 0EBFCD88
+      filename: docker.list
+
+## Write arbitrary files to the file-system (including binaries!)
+write_files:
+  - path: /etc/docker/daemon.json
+    content: |
+      {
+        "exec-opts": ["native.cgroupdriver=systemd"],
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "100m"
+        },
+        "storage-driver": "overlay2"
+      }
+    permissions: '0644'
+    owner: root:root
+  - path: /etc/modules-load.d/k8s.conf
+    content: |
+      br_netfilter
+    permissions: '0644'
+    owner: root:root
+  - path: /etc/issue
+    content: |
+      {
+        Ubuntu 21.04 \n \l
+
+        eth0: \4{eth0}
+        wlan0: \4{wlan0}
+
+      }
+    permissions: '0644'
+    owner: root:root
+
+## Update apt database and upgrade packages on first boot
+package_update: true
+package_upgrade: true
+# Install additional packages on first boot
+#
+# Default: none
+#
+# if packages are specified, this apt_update will be set to true
+#
+# packages may be supplied as a single package name or as a list
+# with the format [<package>, <version>] wherein the specifc
+# package version will be installed.
+ 
+## Install additional packages on first boot
+packages:
+  - curl
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - iotop
+  - jq
+  - keyutils
+  - lsb-release
+  - libnfsidmap2
+  - mlocate
+  - net-tools
+  - nfs-kernel-server
+  - nfs-common
+  - python3
+  - python3-dev
+  - python3-pip
+  - python3-setuptools 
+  - rpcbind
+  - rsync
+  - watchdog
+  - software-properties-common
+  - sudo
+  - tzdata
+  - vim
+  - wget
+
+runcmd:
+  - [ /usr/sbin/ntpdate, pool.ntp.org ]
+  - [ sudo, sed, -i, '$ s/$/ cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 swapaccount=1/', /boot/firmware/cmdline.txt ]
+  - [ usermod, -a, -G, docker, ubuntu ]
+  - [ sudo, docker, run, --privileged, -d, --restart=unless-stopped, -p, 80:80, -p, 443:443, rancher/rancher ]
+
+## poweroff or reboot system after finished
+# default: none
+#
+# power_state can be used to make the system shutdown, reboot or
+# halt after boot is finished.  This same thing can be acheived by
+# user-data scripts or by runcmd by simply invoking 'shutdown'.
+# 
+# Doing it this way ensures that cloud-init is entirely finished with
+# modules that would be executed, and avoids any error/log messages
+# that may go to the console as a result of system services like
+# syslog being taken down while cloud-init is running.
+#
+# If you delay '+5' (5 minutes) and have a timeout of
+# 120 (2 minutes), then the max time until shutdown will be 7 minutes.
+# cloud-init will invoke 'shutdown +5' after the process finishes, or
+# when 'timeout' seconds have elapsed.
+#
+# delay: form accepted by shutdown.  default is 'now'. other format
+#        accepted is '+m' (m in minutes)
+# mode: required. must be one of 'poweroff', 'halt', 'reboot'
+# message: provided as the message argument to 'shutdown'. default is none.
+# timeout: the amount of time to give the cloud-init process to finish
+#          before executing shutdown.
+# condition: apply state change only if condition is met.
+#            May be boolean True (always met), or False (never met),
+#            or a command string or list to be executed.
+#            command's exit code indicates:
+#               0: condition met
+#               1: condition not met
+#            other exit codes will result in 'not met', but are reserved
+#            for future use.
+#
+
+power_state:
+  mode: reboot
+  message: Bye Bye
+  timeout: 30
+  condition: True
+
+# final_message
+# default: cloud-init boot finished at $TIMESTAMP. Up $UPTIME seconds
+# this message is written by cloud-final when the system is finished
+# its first boot
+final_message: "The system is finally up, after $UPTIME seconds"
