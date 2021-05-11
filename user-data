@@ -18,7 +18,7 @@ users:
   groups: adm, dialout, cdrom, floppy, sudo, audio, dip, video, plugdev, netdev, lxd
   chpasswd: {expire: False}
   lock_passwd: false
-  # Passowrd is DS1Rocks
+  # Password DS1Rocks
   passwd: $6$rounds=656000$gaNyeryeb4sncOl4$VLElRoLJQ7BQZBGvy.Whh77bxphIJYOFjwrtsJHpg/x6ZTZ8R6Iep8EjDvPaLmnkfHvNIkA/PUYIGwEPDgc9F/
   ssh_import_id: None
   ssh_pwauth: true
@@ -32,6 +32,7 @@ groups:
 - docker: [docker]
 
 hostname: rancher-mgmt
+manage_etc_hosts: true
 locale: "en_US.UTF-8"
 timezone: "America/Chicago"
 
@@ -66,10 +67,10 @@ write_files:
     owner: root:root
   - path: /etc/issue
     content: |
-        Ubuntu 21.04 \n \l
+        Ubuntu \n \l
 
         eth0: \4{eth0}
-        wlan0: \4{wlan0}       
+        wlan0: \4{wlan0}
     permissions: '0644'
     owner: root:root
   - path: /etc/exports
@@ -91,6 +92,7 @@ write_files:
 ## Update apt database and upgrade packages on first boot
 package_update: true
 package_upgrade: true
+package_reboot_if_required: true
 # Install additional packages on first boot
 #
 # Default: none
@@ -128,6 +130,9 @@ packages:
   - tzdata
   - vim
   - wget
+
+bootcmd:
+  - mkdir -p /srv/k8s
 
 runcmd:
   - [ /usr/sbin/ntpdate, pool.ntp.org ]
