@@ -8,8 +8,8 @@ Flash each SD card with Ubuntu [20.04](https://ubuntu.com/download/raspberry-pi/
 - user-data is the cloud-init file for the Rancher Management Node and NFS Server
 - user-data2 is the cloud-init file for the Rancher K8s Node
 
-## Minimum Hardware:
-2 or more Raspberry Pi 4 8GB
+### Minimum Hardware:
+2 or more Raspberry Pi 4 4GB
 
-## Recommended Hardware:
+### Recommended Hardware:
 2 or more Raspberry Pi 4 8GB
