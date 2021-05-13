@@ -116,8 +116,8 @@ packages:
   - wget
 
 bootcmd:
-  - sudo timedatectl set-timezone America/Chicago
-  
+  - sudo date -u
+
 runcmd:
   - [ /usr/sbin/ntpdate, pool.ntp.org ]
   - [ sudo, sed, -i, '$ s/$/ cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 swapaccount=1/', /boot/firmware/cmdline.txt ]
