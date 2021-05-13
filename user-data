@@ -36,13 +36,13 @@ manage_etc_hosts: true
 locale: "en_US.UTF-8"
 timezone: "America/Chicago"
 
-apt:
-  preserve_sources_list: true
-  sources:
-    docker.list:
-      source: "deb [arch=arm64] https://download.docker.com/linux/ubuntu $RELEASE stable"
-      keyid: 0EBFCD88
-      filename: docker.list
+#apt:
+#  preserve_sources_list: true
+#  sources:
+#    docker.list:
+#      source: "deb [arch=arm64] https://download.docker.com/linux/ubuntu $RELEASE stable"
+#      keyid: 0EBFCD88
+#      filename: docker.list
 
 ## Write arbitrary files to the file-system (including binaries!)
 write_files:
