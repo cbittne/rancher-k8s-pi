@@ -31,7 +31,7 @@ groups:
 - ubuntu: [ubuntu]
 - docker: [docker]
 
-hostname: rancher-mgmt
+hostname: rancher-node
 manage_etc_hosts: true
 locale: "en_US.UTF-8"
 timezone: "America/Chicago"
@@ -73,21 +73,6 @@ write_files:
         wlan0: \4{wlan0}
     permissions: '0644'
     owner: root:root
-  - path: /etc/exports
-    content: |
-      # /etc/exports: the access control list for filesystems which may be exported
-      #		to NFS clients.  See exports(5).
-      #
-      # Example for NFSv2 and NFSv3:
-      # /srv/homes       hostname1(rw,sync,no_subtree_check) hostname2(ro,sync,no_subtree_check)
-      #
-      # Example for NFSv4:
-      # /srv/nfs4        gss/krb5i(rw,sync,fsid=0,crossmnt,no_subtree_check)
-      # /srv/nfs4/homes  gss/krb5i(rw,sync,no_subtree_check)
-      #
-      /srv/k8s	*(rw,no_root_squash,insecure,async,no_subtree_check,anonuid=1001,anongid=1001)
-    permissions: '0644'
-    owner: root:root
 
 ## Update apt database and upgrade packages on first boot
 package_update: true
@@ -115,7 +100,6 @@ packages:
   - lsb-release
   - mlocate
   - net-tools
-  - nfs-kernel-server
   - nfs-common
   - ntpdate
   - python3
@@ -131,21 +115,15 @@ packages:
   - vim
   - wget
 
-bootcmd:
-  - mkdir -p /srv/k8s
-
 runcmd:
   - [ /usr/sbin/ntpdate, pool.ntp.org ]
   - [ sudo, sed, -i, '$ s/$/ cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 swapaccount=1/', /boot/firmware/cmdline.txt ]
-  - sudo docker volume create portainer_data
-  - sudo docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
   - usermod -a -G docker ubuntu
   - mkdir -p /srv/rancher
   - sudo systemctl enable nfs-server
   - sudo systemctl start nfs-server
   - sudo systemctl enable docker
   - sudo systemctl start docker
-  - sudo docker run --privileged -d --restart=unless-stopped --name rancher -p 80:80 -p 443:443 --mount type=bind,source=/srv/rancher,target=/var/lib/rancher rancher/rancher:v2.5.7
 
 ## poweroff or reboot system after finished
 # default: none
