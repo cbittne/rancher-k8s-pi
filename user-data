@@ -36,13 +36,13 @@ manage_etc_hosts: true
 locale: "en_US.UTF-8"
 timezone: "America/Chicago"
 
-#apt:
-#  preserve_sources_list: true
-#  sources:
-#    docker.list:
-#      source: "deb [arch=arm64] https://download.docker.com/linux/ubuntu $RELEASE stable"
-#      keyid: 0EBFCD88
-#      filename: docker.list
+apt:
+ preserve_sources_list: true
+ sources:
+   docker.list:
+     source: "deb [arch=arm64] https://download.docker.com/linux/ubuntu $RELEASE stable"
+     keyid: 0EBFCD88
+     filename: docker.list
 
 ## Write arbitrary files to the file-system (including binaries!)
 write_files:
@@ -106,9 +106,9 @@ package_reboot_if_required: true
 ## Install additional packages on first boot
 packages:
   - curl
-#  - docker-ce
-#  - docker-ce-cli
-#  - containerd.io
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
   - gnupg2
   - iotop
   - jq
@@ -138,10 +138,10 @@ bootcmd:
 runcmd:
   - [ /usr/sbin/ntpdate, pool.ntp.org ]
   - [ sudo, sed, -i, '$ s/$/ cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 swapaccount=1/', /boot/firmware/cmdline.txt ]
-  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-  - echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  - sudo apt-get update
-  - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+  # - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+  # - echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  # - sudo apt-get update -y
+  # - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
   - sudo docker volume create portainer_data
   - sudo docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
   - usermod -a -G docker ubuntu
