@@ -134,6 +134,7 @@ packages:
 
 bootcmd:
   - mkdir -p /srv/k8s
+  - sudo date -u
 
 runcmd:
   - [ /usr/sbin/ntpdate, pool.ntp.org ]
