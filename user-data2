@@ -34,7 +34,7 @@ groups:
 hostname: rancher-node
 manage_etc_hosts: true
 locale: "en_US.UTF-8"
-#timezone: "America/Chicago"
+timezone: "America/Chicago"
 
 apt:
  preserve_sources_list: true
@@ -115,6 +115,9 @@ packages:
   - vim
   - wget
 
+bootcmd:
+  - sudo timedatectl set-timezone America/Chicago
+  
 runcmd:
   - [ /usr/sbin/ntpdate, pool.ntp.org ]
   - [ sudo, sed, -i, '$ s/$/ cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 swapaccount=1/', /boot/firmware/cmdline.txt ]

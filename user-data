@@ -34,7 +34,7 @@ groups:
 hostname: rancher-mgmt
 manage_etc_hosts: true
 locale: "en_US.UTF-8"
-#timezone: "America/Chicago"
+timezone: "America/Chicago"
 
 apt:
  preserve_sources_list: true
@@ -134,6 +134,7 @@ packages:
 
 bootcmd:
   - mkdir -p /srv/k8s
+  - sudo timedatectl set-timezone America/Chicago
 
 runcmd:
   - [ /usr/sbin/ntpdate, pool.ntp.org ]
