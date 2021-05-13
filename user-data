@@ -109,6 +109,7 @@ packages:
   - docker-ce
   - docker-ce-cli
   - containerd.io
+  - gnupg2
   - iotop
   - jq
   - keyutils
