@@ -116,7 +116,7 @@ packages:
   - wget
 
 bootcmd:
-  - sudo date -u
+  - sudo date -s '14 May 2021 06:00'
 
 runcmd:
   - [ /usr/sbin/ntpdate, pool.ntp.org ]
