@@ -1,0 +1,83 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mariadb-secrets
+  namespace: mariadb
+type: Opaque
+data:
+  ROOT_PASSWORD: TDBnIXRlY2g=
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mariadb-data-disk
+  namespace: mariadb
+spec:
+  storageClassName: managed-nfs-storage
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb
+  namespace: mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: mariadb
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        component: mariadb
+        app: mariadb
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb
+          resources:
+            requests:
+              memory: "1Gi"
+            limits:
+              memory: "3Gi"         
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: "/var/lib/mariadb"
+              subPath: "mariadb"
+              name: mariadb-data
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secrets
+                  key: ROOT_PASSWORD
+            - name: MYSQL_ROOT_HOST
+              value: "%"
+      volumes:
+        - name: mariadb-data
+          persistentVolumeClaim:
+            claimName: mariadb-data-disk
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-service
+  namespace: mariadb
+spec:
+  selector:
+    app: mariadb
+    component: mariadb
+  ports:
+  - port: 3306
+    targetPort: 3306
+    name: mariadbport
+  # externalIPs:
+  #   - 192.168.1.228
+  type: LoadBalancer

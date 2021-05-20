@@ -25,11 +25,11 @@ spec:
             - name: PROVISIONER_NAME
               value: nfs
             - name: NFS_SERVER
-              value: 192.168.1.135
+              value: 192.168.1.158
             - name: NFS_PATH
               value: /srv/k8s
       volumes:
         - name: nfs-client-root
           nfs:
-            server: 192.168.1.135
+            server: 192.168.1.158
             path: /srv/k8s

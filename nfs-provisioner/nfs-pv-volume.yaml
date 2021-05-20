@@ -12,4 +12,4 @@ spec:
     - ReadWriteMany
   nfs:
     path: /srv/k8s
-    server: 192.168.1.135
+    server: 192.168.1.158
