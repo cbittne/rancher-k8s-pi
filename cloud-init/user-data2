@@ -94,12 +94,14 @@ packages:
   - docker-ce
   - docker-ce-cli
   - containerd.io
+  - gnupg2
   - iotop
   - jq
   - keyutils
   - lsb-release
   - mlocate
   - net-tools
+  - nfs-kernel-server
   - nfs-common
   - ntpdate
   - python3
